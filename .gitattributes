@@ -1,0 +1,2 @@
+# Runs on Linux (and in Docker): LF everywhere, also in Windows checkouts
+* text=auto eol=lf

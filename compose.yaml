@@ -1,0 +1,23 @@
+services:
+  atvdaemon:
+    build: .
+    image: atvdaemon
+    container_name: atvdaemon
+    # Host networking: no NAT between the ESP32 and the daemon, no port mapping (UDP 7777 is bound
+    # on the NAS directly), and pyatv's unicast mDNS scan of the Apple TV works as it does bare.
+    network_mode: host
+    restart: unless-stopped
+    # Not root: your user on the NAS (`id -u`, `id -g`), so data/pyatv.conf stays yours.
+    # Override with ATVD_UID / ATVD_GID in the shell or a .env file beside this one.
+    user: "${ATVD_UID:-1000}:${ATVD_GID:-1000}"
+    environment:
+      ATVD_ID: "2E:10:43:01:B6:8F"
+      ATVD_HOST: "10.1.1.169"
+      ATVD_PORT: "7777"
+    volumes:
+      - ./data:/data          # pyatv.conf (pairing credentials); gitignored
+    logging:
+      driver: json-file
+      options:
+        max-size: "1m"
+        max-file: "3"

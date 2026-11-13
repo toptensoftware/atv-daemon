@@ -1,0 +1,3 @@
+# Pairing credentials (pyatv.conf) for the container
+data/
+__pycache__/
