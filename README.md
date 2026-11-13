@@ -46,7 +46,17 @@ docker compose run --rm atvdaemon atvremote --storage-filename /data/pyatv.conf 
 ```
 
 The container uses host networking (`compose.yaml`): no NAT or port mapping between the network and the daemon,
-and pyatv's unicast mDNS scan of the Apple TV behaves as it does bare. Settings go in `compose.yaml`'s
+and pyatv's unicast mDNS scan of the Apple TV behaves as it does bare.
+
+**Open the port in the host's firewall.** With host networking Docker adds no firewall rules, so the host's own
+firewall decides: a `ping` to `127.0.0.1` answers but one from another machine gets nothing. The daemon logs every
+datagram it receives (`← (addr, port) 'ping'`), so no such line in `docker compose logs` means the packet never
+arrived.
+
+```bash
+sudo ufw allow 7777/udp                     # ufw
+sudo firewall-cmd --permanent --add-port=7777/udp && sudo firewall-cmd --reload   # firewalld
+``` Settings go in `compose.yaml`'s
 `environment`. After editing the daemon, `docker compose up -d --build`.
 
 The container runs as UID:GID 1000:1000, not root (nothing needs root: the port is above 1024 and the
